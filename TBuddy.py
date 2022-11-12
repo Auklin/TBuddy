@@ -30,16 +30,16 @@ loadoutSwapToggle = False
 basicFishDelay = 3
 configMenuOpen = False
 
-print("Thanks for using TBuddy! Press F9 for to start a configuration menu\n"+
-      "Press v key to switch loadouts\n"+
+print("Thanks for using TBuddy! Press F9 to start the configuration menu\n"+
+      "Press the v key to switch loadouts\n"+
       "Press mouse buttons to quickly use other hotbar items\n"+
       "Press the right Alt key to begin autofishing\n\n"+
       "Advanced Fishing Instructions:\n"+
-      "\t1) Click where you would like to cast, do not unclick\n"
-      "\t2) Move and unclick on your bobber\n"+
+      "\t1) Click where you would like to cast, hold the click / do no unclick\n"
+      "\t2) Move your mouse over your bobber, unclick on your bobber on a pixel that isn't change color\n"+
       "\t3) Press right Alt key, watch to verify functionality\n"+
       "\t4) AFK\n"+
-      "\t5) Use movement keys to cancel"
+      "\t5) Use movement keys to cancel\n"
       "Notes: The script works by constantly checking for a change on the pixel you unclicked on.\n"+
       "UI elements, effects, rain, splashes, knockback and enemies can trigger false positives.\n"+
       "Low lighting may require you to lower tolerance levels in the config, it is usually easier to just light up the area")
@@ -189,13 +189,13 @@ def userConfiguration():
                   f"\n9: Exit\n")
         if (x=='1'):
             
-            x = input("Give a number key for middle mouse, type 'disable' to disable the functionality:: \n")
+            x = input("Give a number key for middle mouse, type 'disable' to disable the functionality: \n")
             if x.isnumeric() and len(x) == 1:
                 quickUseMiddleMouse = x
             if x == 'disable':
                  quickUseMiddleMouse = False
         elif (x=='2'):
-            x = input("Give a number key for forward mouse, type 'disable' to disable the functionality:: \n")
+            x = input("Give a number key for forward mouse, type 'disable' to disable the functionality: \n")
             if x.isnumeric() and len(x) == 1:
                 quickUseForwardMouse = x  
             if x == 'disable':
