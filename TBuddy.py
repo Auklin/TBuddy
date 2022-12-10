@@ -29,14 +29,15 @@ advancedFishTolerance = 75
 loadoutSwapToggle = False
 basicFishDelay = 3
 configMenuOpen = False
+jumpAndFish = False
 
 print("Thanks for using TBuddy! Press F9 to start the configuration menu\n"+
       "Press the v key to switch loadouts\n"+
       "Press mouse buttons to quickly use other hotbar items\n"+
       "Press the right Alt key to begin autofishing\n\n"+
       "Advanced Fishing Instructions:\n"+
-      "\t1) Click where you would like to cast, hold the click / do no unclick\n"
-      "\t2) Move your mouse over your bobber, unclick on your bobber on a pixel that isn't change color\n"+
+      "\t1) Click where you would like to cast, hold the click / do not unclick\n"
+      "\t2) Move your mouse over your bobber, unclick on a pixel that won't change color unless a fish is biting\n"+
       "\t3) Press right Alt key, watch to verify functionality\n"+
       "\t4) AFK\n"+
       "\t5) Use movement keys to cancel\n"
@@ -103,6 +104,17 @@ def pressKey(key):
     keyboardController.press(key)
     wait(0.05+clickDelay)
     keyboardController.release(key)
+    
+#potential future functionality
+def dash(key):
+    keyboardController.release(key)
+    wait(0.05+clickDelay)
+    keyboardController.press(key)
+    wait(0.05+clickDelay)
+    keyboardController.release(key)
+    wait(0.05+clickDelay)
+    keyboardController.press(key)
+    wait(0.05+clickDelay)
 
 # Quickly use a hotbar key, then return to last selected hotbar item
 def quickUse(key):
@@ -122,19 +134,16 @@ def basicFish():
     global keepRunning, basicFishDelay
     keepRunning = True
     while keepRunning:
-        print("Starting Loop")
         leftClickSlow()
-        print("Waiting ",basicFishDelay, " seconds")
         wait(basicFishDelay)
         leftClickSlow()
-        print("Catching fish")
         wait(.4)
 
 # Pixel tracking fishing script
 def advancedFish():
     print("Starting Advanced Fish")
     
-    global pressedCords, releasedCords, advancedFishTolerance
+    global pressedCords, releasedCords, advancedFishTolerance, jumpAndFish
     (px,py) = pressedCords
     (rx,ry) = releasedCords
     t = advancedFishTolerance #Tolerance for pixel changes
@@ -156,10 +165,12 @@ def advancedFish():
             if ( (r-t < xr < r+t) and (g-t < xg < g+t) and (b-t < xb < b+t)):
                 continue
             catchCount+=1
-            print(f"The bobber pixel changed! Reeling in #{catchCount}")
             break
         if not keepRunning:
+            print(f"You reeled in {catchCount} fish!")
             break
+        if jumpAndFish:
+            pressKey(keyboard.Key.space)
         leftClickSlow()
         wait(.5)
     
@@ -174,7 +185,7 @@ def get_pixel_colour(i_x, i_y):
 
 def userConfiguration():
     configuring = True
-    global quickUseMiddleMouse, quickUseForwardMouse, quickUseBackMouse, loadoutSwapToggle, fishingType, advancedFishTolerance, basicFishDelay, clickDelay, configMenuOpen
+    global quickUseMiddleMouse, quickUseForwardMouse, quickUseBackMouse, loadoutSwapToggle, fishingType, advancedFishTolerance, basicFishDelay, clickDelay, configMenuOpen, jumpAndFish
     configMenuOpen = True
     while (configuring):
         x = input("Press key (then press enter) to configure settings: "+
@@ -186,7 +197,8 @@ def userConfiguration():
                   f"\n6: Changed Avanced fishing pixel change tolerance, currently set to {advancedFishTolerance}"+
                   f"\n7: Change delay/ time of Basic auto fish, currently set to {basicFishDelay}"+
                   f"\n8: Change delay of autoclicking (useful for older computers), currently set to {clickDelay} seconds"+
-                  f"\n9: Exit\n")
+                  f"\n9: Add a cute lil' hop when you catch a fish. currently set to {jumpAndFish}"+
+                  f"\n0: Exit\n")
         if (x=='1'):
             
             x = input("Give a number key for middle mouse, type 'disable' to disable the functionality: \n")
@@ -237,8 +249,9 @@ def userConfiguration():
                 print('Basic fishing delay is now ',clickDelay)
             except:
                 print ('Invalid input')
-            
         elif (x=='9'):
+            jumpAndFish = not jumpAndFish
+        elif (x=='0'):
             configuring = False
             print("Exiting Menu")
         else:
@@ -248,11 +261,9 @@ def userConfiguration():
     
 
 # print(pyautogui.position().x)
-
 # Detects key press
 def on_press(key):
     global keepRunning, currentLoadout
-    
     # If non-alphanumeric key:
     if (isinstance(key,keyboard.Key)):
         match key:
@@ -268,12 +279,15 @@ def on_press(key):
                     thread2 = threading.Thread(target = userConfiguration, args=())
                     thread2.start()
             case keyboard.Key.alt_gr:
-                keepRunning = True
-                if fishingType == 'Advanced':
-                    thread2 = threading.Thread(target = advancedFish, args=())
-                elif fishingType == 'Basic':
-                    thread2 = threading.Thread(target = basicFish, args=())
-                thread2.start()
+                if keepRunning == True:
+                    keepRunning = False
+                else:
+                    keepRunning = True
+                    if fishingType == 'Advanced':
+                        thread2 = threading.Thread(target = advancedFish, args=())
+                    elif fishingType == 'Basic':
+                        thread2 = threading.Thread(target = basicFish, args=())
+                    thread2.start()
                 
     # If alphanumeric key
     elif (isinstance(key,keyboard.KeyCode)):
